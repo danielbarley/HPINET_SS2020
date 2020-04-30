@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# OMNeT++
+.cmdenv-log
+ueb*/simulations/results/
+ueb*/out/

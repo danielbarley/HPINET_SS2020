@@ -1,0 +1,3 @@
+package packettest;
+
+@license(LGPL);
