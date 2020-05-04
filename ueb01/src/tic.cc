@@ -30,7 +30,7 @@ void Tic::initialize()
 
 void Tic::handleMessage(cMessage *msg)
 {
-    if ((unsigned int)par("NUM_DISCARD") != 0 && cnt >= (unsigned int)par("NUM_DISCARD")) {
+    if (auto num = (unsigned int)par("NUM_DISCARD"); num != 0 && cnt >= num) {
         delete msg;
     } else {
         send(msg, "data$o");
