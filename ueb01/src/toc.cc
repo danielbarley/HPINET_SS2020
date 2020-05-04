@@ -17,16 +17,9 @@
 
 Define_Module(Toc);
 
-void Toc::initialize()
-{}
+void Toc::initialize() {}
 
 void Toc::handleMessage(cMessage *msg)
 {
-    delete msg;
-    //double interval = (int)(par("PKT_SIZE")) * 8 / (double)(par("DATA_RATE"));
-    //scheduleAt(simTime() + interval, msg);
-
-    cPacket *dataPkt = new cPacket("Toc");
-    dataPkt->setByteLength(par("PKT_SIZE"));
-    send(dataPkt, "data$o");
+    send(msg, "data$o");
 }

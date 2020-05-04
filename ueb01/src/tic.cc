@@ -22,19 +22,18 @@ Define_Module(Tic);
 
 void Tic::initialize()
 {
-    //std::shared_ptr<cMessage> selfmsg = std::make_shared<cMessage>("Timer");
-    //cMessage * selfmsg = new cMessage("Timer");
-    //scheduleAt(simTime(), selfmsg);
-    cPacket *dataPkt = new cPacket("Tic");
+    cnt = 1;
+    cPacket *dataPkt = new cPacket("msg");
     dataPkt->setByteLength(par("PKT_SIZE"));
     send(dataPkt, "data$o");
 }
 
 void Tic::handleMessage(cMessage *msg)
 {
-    delete msg;
-
-    cPacket *dataPkt = new cPacket("Tic");
-    dataPkt->setByteLength(par("PKT_SIZE"));
-    send(dataPkt, "data$o");
+    if ((unsigned int)par("NUM_DISCARD") != 0 && cnt >= (unsigned int)par("NUM_DISCARD")) {
+        delete msg;
+    } else {
+        send(msg, "data$o");
+        cnt++;
+    }
 }

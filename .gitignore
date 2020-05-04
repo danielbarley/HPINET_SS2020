@@ -35,6 +35,8 @@
 .cmdenv-log
 ueb*/simulations/results/
 ueb*/out/
+/.metadata/
+ueb*/**/Makefile
 
 # LaTeX
 ## Core latex/pdflatex auxiliary files:
