@@ -47,7 +47,7 @@
 		<cconfiguration id="org.omnetpp.cdt.gnu.config.release.1608577293">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.omnetpp.cdt.gnu.config.release.1608577293" moduleId="org.eclipse.cdt.core.settings" name="release">
 				<macros>
-					<stringMacro name="CXXFLAGS" type="VALUE_TEXT" value="-std=c++17"/>
+					<stringMacro name="CXXFLAGS" type="VALUE_TEXT" value="-std=c++14"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
