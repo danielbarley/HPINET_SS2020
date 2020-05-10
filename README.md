@@ -14,7 +14,8 @@
 - in `<project-root>` run
 
 ```bash
-make MODE=release all
+opp_makemake -f
+make MODE=release clean all
 ```
 
 - then invoke simulator w/

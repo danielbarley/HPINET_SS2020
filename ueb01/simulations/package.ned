@@ -1,7 +1,6 @@
 package packettest.simulations;
 
-import packettest.Tic;
-import packettest.Toc;
+import packettest.Simple;
 import ned.DelayChannel;
 
 network ueb01_1 {
@@ -17,19 +16,20 @@ network ueb01_1 {
         }
 
     submodules:
-        node0: Tic {
+        tic: Simple {
             PKT_SIZE = PKT_SIZE_NET;
             DATA_RATE = DATA_RATE_NET;
             NUM_DISCARD = NUM_DISCARD_NET;
+            TIC = true;
         }
 
-        node1: Toc {
+        toc: Simple {
             PKT_SIZE = PKT_SIZE_NET;
             DATA_RATE = DATA_RATE_NET;
         }
 
     connections:
-        node0.data<-->C<-->node1.data;
+        tic.data<-->C<-->toc.data;
 }
 
 network ueb01_3 {
@@ -44,16 +44,17 @@ network ueb01_3 {
         }
 
     submodules:
-        tic: Tic {
+        tic: Simple {
             PKT_SIZE = PKT_SIZE_NET;
             DATA_RATE = DATA_RATE_NET;
+            TIC = true;
         }
 
-        node1: Toc {
+        toc: Simple {
             PKT_SIZE = PKT_SIZE_NET;
             DATA_RATE = DATA_RATE_NET;
         }
 
     connections:
-        tic.data <--> C <--> node1.data;
+        tic.data <--> C <--> toc.data;
 }

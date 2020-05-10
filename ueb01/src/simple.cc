@@ -12,23 +12,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
+//
 
-#ifndef __PACKETTEST_TIC_H_
-#define __PACKETTEST_TIC_H_
+//#include <memory>
 
-#include <omnetpp.h>
+#include "simple.h"
 
-using namespace omnetpp;
+Define_Module(Simple);
 
-/**
- * TODO - Generated class
- */
-class Tic : public cSimpleModule
-{
-  protected:
-    unsigned int cnt;
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-};
+void Simple::initialize() {
+    cnt = 1;
+    if ( static_cast<bool>(par("TIC")) ) {
+        cPacket *dataPkt = new cPacket("msg");
+        dataPkt->setByteLength(par("PKT_SIZE"));
+        send(dataPkt, "data$o");
+    }
+}
 
-#endif
+void Simple::handleMessage(cMessage *msg) {
+    if (
+        static_cast<unsigned int>(par("NUM_DISCARD")) != 0
+        && cnt >= static_cast<unsigned int>(par("NUM_DISCARD"))
+    ) {
+        delete msg;
+    } else {
+        send(msg, "data$o");
+        cnt++;
+    }
+}

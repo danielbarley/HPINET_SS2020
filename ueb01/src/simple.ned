@@ -12,28 +12,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
-//
 
-//#include <memory>
+package packettest;
 
-#include "tic.h"
-
-Define_Module(Tic);
-
-void Tic::initialize()
+simple Simple
 {
-    cnt = 1;
-    cPacket *dataPkt = new cPacket("msg");
-    dataPkt->setByteLength(par("PKT_SIZE"));
-    send(dataPkt, "data$o");
-}
-
-void Tic::handleMessage(cMessage *msg)
-{
-    if ((unsigned int)par("NUM_DISCARD") != 0 && cnt >= (unsigned int)par("NUM_DISCARD")) {
-        delete msg;
-    } else {
-        send(msg, "data$o");
-        cnt++;
-    }
+	parameters:
+		int PKT_SIZE @unit(byte) = default(512Byte);
+		double DATA_RATE @unit(bps) = default(1Gbps);
+        int NUM_DISCARD = default(0);
+        bool TIC = default(false);
+    gates:
+        inout data;
 }

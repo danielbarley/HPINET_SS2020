@@ -13,16 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package packettest;
+#ifndef __PACKETTEST_TIC_H_
+#define __PACKETTEST_TIC_H_
 
-//
-// TODO auto-generated module
-//
-simple Toc
+#include <omnetpp.h>
+
+using namespace omnetpp;
+
+class Simple : public cSimpleModule
 {
-	parameters:
-		int PKT_SIZE @unit(byte) = default(512Byte);
-		double DATA_RATE @unit(bps) = default(1Gbps);
-    gates:
-        inout data;
-}
+  protected:
+    unsigned int cnt;
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+};
+
+#endif
