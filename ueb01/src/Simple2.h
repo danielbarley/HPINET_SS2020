@@ -30,6 +30,7 @@ class Simple2 : public cSimpleModule
     unsigned int cnt;
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void send_random(cMessage *msg);
 };
 
 #endif

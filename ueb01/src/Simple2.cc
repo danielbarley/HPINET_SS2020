@@ -18,7 +18,7 @@
 
 Define_Module(Simple2);
 
-void send_random(cMessage* msg) {
+void Simple2::send_random(cMessage* msg) {
     bool next = static_cast<bool>(intuniform(0,1));
     if (next) {
         send(msg, "next$o");
