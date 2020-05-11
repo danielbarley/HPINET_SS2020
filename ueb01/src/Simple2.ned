@@ -20,7 +20,7 @@ simple Simple2
 	parameters:
 		int PKT_SIZE @unit(byte) = default(512Byte);
 		double DATA_RATE @unit(bps) = default(1Gbps);
-        int NUM_DISCARD = default(0);
+        int NUM_DISCARD = default(5);
         bool TIC = default(false);
     gates:
         inout next;

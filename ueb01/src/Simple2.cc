@@ -30,7 +30,7 @@ void Simple2::send_random(cMessage* msg) {
 
 void Simple2::initialize()
 {
-    cnt = 0;
+    cnt = 1;
     if ( static_cast<bool>(par("TIC")) ) {
             cPacket *dataPkt = new cPacket("msg");
             dataPkt->setByteLength(par("PKT_SIZE"));
@@ -42,11 +42,12 @@ void Simple2::handleMessage(cMessage *msg)
 {
     if (static_cast<bool>(par("TIC"))){
         cnt++;
-        if (cnt < 6) {
+        if (cnt <= static_cast<int>(par("NUM_DISCARD"))) {
             send_random(msg);
         }
         else {
             delete msg;
+            cnt = 1;
             cPacket *dataPkt = new cPacket("msg");
             dataPkt->setByteLength(par("PKT_SIZE"));
             send(dataPkt, "next$o");
