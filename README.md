@@ -14,6 +14,7 @@
 - in `<project-root>` run
 
 ```bash
+cd src
 opp_makemake -f
 make MODE=release clean all
 ```
@@ -21,6 +22,6 @@ make MODE=release clean all
 - then invoke simulator w/
 
 ```bash
-cd simulations
-../out/<compiler-release>/<proj-file> -n .:../src
+cd ../simulations
+../src/<proj_name> -n .:../src
 ```
