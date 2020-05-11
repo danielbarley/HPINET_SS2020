@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from src/MyPacket.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from MyPacket.msg.
 //
 
 #ifndef __MYPACKET_M_H
@@ -19,7 +19,7 @@
 
 
 /**
- * Class generated from <tt>src/MyPacket.msg:19</tt> by nedtool.
+ * Class generated from <tt>MyPacket.msg:19</tt> by nedtool.
  * <pre>
  * //
  * // TODO generated message class
