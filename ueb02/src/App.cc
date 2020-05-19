@@ -3,8 +3,8 @@
 Define_Module(App);
 
 void App::initialize() {
-    //nodeID = this->getId();
-    sendDelay = par("sendDelay");
+    nodeID = static_cast<int>(par("nodeID"));
+    sendDelay = static_cast<double>(par("sendDelay"));
 }
 
 void App::handleMessage(cMessage *msg) {
