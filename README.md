@@ -14,9 +14,9 @@
 - in `<project-root>` run
 
 ```bash
+opp_makemake -f --deep
 cd src
-opp_makemake -f
-make MODE=release clean all
+make MODE=release all
 ```
 
 - then invoke simulator w/
