@@ -19,7 +19,7 @@ network SrcSink {
 
     connections:
         for i = 0..NUM_NODES-2 {
-            App[i].data_out --> App[i+1].data_in;
+            App[i].data_out --> C --> App[i+1].data_in;
         }
-        App[NUM_NODES-1].data_out --> App[0].data_in;
+        App[NUM_NODES-1].data_out --> C --> App[0].data_in;
 }

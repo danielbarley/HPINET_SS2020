@@ -5,3 +5,6 @@ build/%: %
 
 run/%: % build/%
 	cd $</simulations; ../src/$< -n .:../src
+
+clean/%: %
+	cd $</; make clean

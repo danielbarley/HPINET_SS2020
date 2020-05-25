@@ -8,6 +8,11 @@ void App::initialize() {
     sendDelay = static_cast<double>(par("sendDelay"));
     numNodes = static_cast<int>(par("numNodes"));
     scheduleAt(simTime(), new cMessage);
+
+    //register stats
+    sigPacketSent = registerSignal("sigPacketSent");
+    sigPacketReceived = registerSignal("sigPacketReceived");
+    sigPacketReceivedSize = registerSignal("sigPacketReceivedSize");
 }
 
 void App::handleMessage(cMessage *msg) {
@@ -20,6 +25,7 @@ void App::handleMessage(cMessage *msg) {
         pkt->setBitLength(packetLength);
         send(pkt, "data_out");
         scheduleAt(simTime() + sendDelay, msg);
+        emit(sigPacketSent, true);
     } else {
         // not a self message make sure it's a Packet
         if (dynamic_cast<Packet *>(msg) != nullptr) {
@@ -27,10 +33,13 @@ void App::handleMessage(cMessage *msg) {
             Packet *pkt = (Packet *) msg;
             if (pkt->getDestination() == nodeID) {
                 EV_INFO << "and it was for me" << endl;
+                emit(sigPacketReceivedSize, static_cast<long>(pkt->getBitLength()));
                 delete msg;
+                emit(sigPacketReceived, true);
             } else {
                 EV_INFO << "but it was not for me sending to next node" << endl;
                 send(pkt, "data_out");
+                emit(sigPacketSent, true);
             }
         } else {
             // not a Packet throw it away
