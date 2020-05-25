@@ -4,6 +4,7 @@ simple App
 {
     parameters:
         int nodeID;
+        int numNodes;
         volatile double sendDelay @unit(s) = uniform(1.0us, 10.0us);
 
     gates:

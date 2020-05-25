@@ -11,7 +11,8 @@ class App : public cSimpleModule
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
   private:
-    long nodeID;
+    int nodeID;  // own node ID
+    int numNodes; // total number of nodes in Network
     double sendDelay;
 };
 

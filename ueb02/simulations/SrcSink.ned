@@ -3,7 +3,7 @@ package ueb02.simulations;
 import ueb02.App;
 import ned.DelayChannel;
 
-network nw2_1 {
+network SrcSink {
     parameters:
         double CHANNEL_DELAY @unit(s) = default(1ms);
         int NUM_NODES = default(2);
