@@ -17,7 +17,7 @@ simple App
         @statistic[statPacketsReceivedSize](
             title="Size of Packets Received";
             source=sigPacketReceivedSize;
-            record=histogram;
+            record=vector;
         );
         @statistic[statPacketsSent](
             title="Packets Sent";
