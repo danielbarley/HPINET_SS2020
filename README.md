@@ -25,3 +25,12 @@ make MODE=release all
 cd ../simulations
 ../src/<proj_name> -n .:../src
 ```
+
+## Statistics w/ Python
+
+1) run `scavetool x <vec-file> -o <csv-file>`
+2) use `<csv-file>` in python e.g.:
+
+```bash
+python python/main.py <csv-file> <output-pdf>
+```
