@@ -2,7 +2,7 @@
 
 ## Usage
 
-- Set OMNeT++ Wordir to repo root
+- Set OMNeT++ workdir to repo root
 
 - If a Project does not show up:
   - Create a new `OMNeT++ Project` (`File > New > OMNet++ Project`)
@@ -26,7 +26,7 @@ cd ../simulations
 ../src/<proj_name> -n .:../src
 ```
 
-## Statistics w/ Python
+## [Statistics w/ Python](https://docs.omnetpp.org/tutorials/pandas/)
 
 1) run `scavetool x <vec-file> -o <csv-file>`
 2) use `<csv-file>` in python e.g.:
