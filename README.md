@@ -26,7 +26,7 @@ cd ../simulations
 ../src/<proj_name> -n .:../src
 ```
 
-## [Statistics w/ Python](https://docs.omnetpp.org/tutorials/pandas/)
+## Statistics w/ Python
 
 1) run `scavetool x <vec-file> -o <csv-file>`
 2) use `<csv-file>` in python e.g.:
@@ -34,3 +34,10 @@ cd ../simulations
 ```bash
 python python/main.py <csv-file> <output-pdf>
 ```
+
+## References
+
+- [Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/)
+- [Users's Guide](https://inet.omnetpp.org/docs/users-guide/index.html)
+- [INET Framework](https://doc.omnetpp.org/inet/api-current/neddoc/index.html)
+- [Result Analysis w/ Python](https://docs.omnetpp.org/tutorials/pandas/)
