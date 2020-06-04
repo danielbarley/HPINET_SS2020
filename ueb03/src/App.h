@@ -13,7 +13,6 @@ class App : public cSimpleModule
   private:
     int nodeID;  // own node ID
     int numNodes; // total number of nodes in Network
-    double sendDelay;
     simsignal_t sigPacketSent;
     simsignal_t sigPacketReceived;
     simsignal_t sigPacketReceivedSize;
