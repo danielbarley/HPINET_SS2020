@@ -5,7 +5,6 @@ Define_Module(App);
 
 void App::initialize() {
     nodeID = static_cast<int>(par("nodeID"));
-    sendDelay = static_cast<double>(par("sendDelay"));
     numNodes = static_cast<int>(par("numNodes"));
     scheduleAt(simTime(), new cMessage);
 
@@ -24,7 +23,7 @@ void App::handleMessage(cMessage *msg) {
         pkt->setDestination(destination);
         pkt->setBitLength(packetLength);
         send(pkt, "data_out");
-        scheduleAt(simTime() + sendDelay, msg);
+        scheduleAt(simTime() + static_cast<double>(par("sendDelay")), msg);
         emit(sigPacketSent, true);
     } else {
         // not a self message make sure it's a Packet
