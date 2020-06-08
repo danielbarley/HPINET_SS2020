@@ -9,11 +9,11 @@ void Buffer::initialize() {
 }
 
 void Buffer::handleMessage(cMessage *msg) {
-    simtime_t finishtime = gate("line$o").getTransmissionChannel().getTransmissionFinishTime()
+    simtime_t finishtime = gate("line$o")->getTransmissionChannel()->getTransmissionFinishTime();
     if (msg->isSelfMessage()) { // timer event to check for empty line
         if (finishtime < simTime() || fifo.getLength() > 0) { // line$o not busy and we have data stored
             EV_INFO << "sending out (timer event)\n";
-            send(fifo.pop(), "line$o");
+            send(dynamic_cast<cMessage*>(fifo.pop()), "line$o");
         }
         scheduleAt(simTime() + delay, msg); // recheck in delay seconds
 
@@ -23,7 +23,7 @@ void Buffer::handleMessage(cMessage *msg) {
             send(msg, "line$o");
         } else {
             EV_INFO << "line busy\n";
-            if (par("size") == 0 || fifo.getLength() < par("size")) {
+            if (static_cast<int>(par("size")) == 0 || fifo.getLength() < static_cast<int>(par("size"))) {
                 EV_INFO << "storing msg in queue (line busy)\n";
                 fifo.insert(msg);
             } else {
@@ -32,7 +32,7 @@ void Buffer::handleMessage(cMessage *msg) {
             }
         }
 
-    } else if (msg->arrivedOn("line$i") { //incoming msg from datarate channel
+    } else if (msg->arrivedOn("line$i")) { //incoming msg from datarate channel
         EV_INFO << "sending msg (to higher layer)\n";
         send(msg, "data_out");
 

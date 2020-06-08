@@ -1,6 +1,7 @@
 package ueb03
 
-simple Buffer {
+simple Buffer
+{
     parameters:
         int size = default(0);
         double checkingDelay @unit(s) = default(10ms);

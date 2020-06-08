@@ -1,3 +1,3 @@
-package ueb02.simulations;
+package ueb03.simulations;
 
 @license(LGPL);
