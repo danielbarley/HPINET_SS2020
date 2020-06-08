@@ -1,7 +1,5 @@
 build/%: %
-	cd $<; opp_makemake -f --deep
-	cd $<; make clean
-	cd $<; make MODE=release all
+	cd $</src; opp_makemake -f --deep
 	cd $</src; make clean
 	cd $</src; make MODE=release all
 
