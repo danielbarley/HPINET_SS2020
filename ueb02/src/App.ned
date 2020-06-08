@@ -21,7 +21,7 @@ simple App
         );
         @statistic[statPacketsSent](
             title="Packets Sent";
-            source=count(sigPacketReceived);
+            source=count(sigPacketSent);
             record=vector;
         );
     gates:

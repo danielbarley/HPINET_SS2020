@@ -25,6 +25,7 @@
  * {
  *     int source;
  *     int destination;
+ *     simtime_t enqueued;
  * }
  * </pre>
  */
@@ -33,6 +34,7 @@ class Packet : public ::omnetpp::cPacket
   protected:
     int source;
     int destination;
+    ::omnetpp::simtime_t enqueued;
 
   private:
     void copy(const Packet& other);
@@ -55,6 +57,8 @@ class Packet : public ::omnetpp::cPacket
     virtual void setSource(int source);
     virtual int getDestination() const;
     virtual void setDestination(int destination);
+    virtual ::omnetpp::simtime_t getEnqueued() const;
+    virtual void setEnqueued(::omnetpp::simtime_t enqueued);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const Packet& obj) {obj.parsimPack(b);}

@@ -3,7 +3,7 @@ package ueb03.simulations;
 import ueb03.App;
 import ueb03.Buffer;
 import ueb03.Node;
-import ned.DelayChannel;
+import ned.DatarateChannel;
 
 network Net2 {
 	parameters:
@@ -11,8 +11,9 @@ network Net2 {
 		double DATA_RATE @unit(Gbps) = default(1Gbps);
 
 	types:
-		channel C extends ned.DelayChannel {
+		channel C extends ned.DatarateChannel {
 			delay = CHANNEL_DELAY;
+            datarate = DATA_RATE;
 		}
 
 	submodules:
