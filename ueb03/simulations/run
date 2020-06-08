@@ -1,4 +1,4 @@
 #!/bin/sh
 cd `dirname $0`
-../src/ueb02 -n .:../src $*
+../src/ueb03 -n .:../src $*
 # for shared lib, use: opp_run -l ../src/ueb02 -n .:../src $*

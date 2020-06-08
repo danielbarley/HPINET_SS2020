@@ -2,7 +2,7 @@ package ueb03;
 
 module Node
 {
-	gate:
+	gates:
 		inout line;
 	submodules:
 		app : App;

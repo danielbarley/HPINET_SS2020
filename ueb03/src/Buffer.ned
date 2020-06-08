@@ -1,4 +1,4 @@
-package ueb03
+package ueb03;
 
 simple Buffer
 {
