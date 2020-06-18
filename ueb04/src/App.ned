@@ -5,7 +5,7 @@ simple App
     parameters:
         int nodeID;
         int numNodes;
-        volatile double sendDelay @unit(s) = uniform(1.0us, 10.0us);
+        volatile double sendDelay @unit(s) = uniform(1.0us, 2.0us);
         @signal[sigPacketReceived](type=bool);
         @signal[sigPacketReceivedSize](type=long);
         @signal[sigPacketSent](type=bool);
