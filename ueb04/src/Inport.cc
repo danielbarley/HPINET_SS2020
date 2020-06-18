@@ -15,6 +15,7 @@
 
 #include "Inport.h"
 #include "packet_m.h"
+#include "arbpkt_m.h"
 
 Define_Module(Inport);
 
@@ -25,36 +26,48 @@ void Inport::initialize() {
 }
 
 void Inport::handleMessage(cMessage *msg) {
-    if (msg->isSelfMessage() && granted) { //timer interval and we can send
-        send(front, "line$o", front->destination);
-        if (fifo.length() > 0) { // fifo has packages
-            front = dynamic_cast<Packet *>(fifo.pop());
-            if (front->destination != arbiterWait) { // changing direction
+    if (msg->isSelfMessage()) { //timer interval and we can send
+        if (granted) {
+            send(front, "line$o", front->getDestination());
+            if (fifo.getLength() > 0) { // fifo has packages
+                front = dynamic_cast<Packet *>(fifo.pop());
+                if (front->getDestination() != arbiterWait) { // changing direction
+                    Arbpkt * rel = new Arbpkt();
+                    rel->setType(0);
+                    rel->setSourcePort(front->getSource());
+                    rel->setTargetOutport(front->getDestination());
+                    send(rel, "arbiterCtrl$o", front->getDestination());
+                    granted = false;
+                }
+            } else {
                 cMessage * req = new cMessage();
-                send(req, "arbiterCtrl$o", front->destination);
+                send(req, "arbiterCtrl$o", front->getDestination());
                 granted = false;
             }
-        } else {
-            cMessage * req = new cMessage();
-            send(req, "arbiterCtrl$o", front->destination);
-            granted = false;
         }
         scheduleAt(simTime() + delay, msg); // recheck in delay seconds
     } else if (msg->arrivedOn("in")) {
         if (dynamic_cast<Packet *>(msg) != nullptr) {
+            EV_INFO << "storing" << endl;
             fifo.insert(msg);
         } else {
             // not a Packet throw it away
             EV_INFO << "got non packet message!" << endl;
-            delete msg
+            delete msg;
         }
 
         if (!waiting) {
+            EV_INFO << "popping" << endl;
             front = dynamic_cast<Packet *>(fifo.pop());
-            cMessage * req = new cMessage();
-            send(req, "arbiterCtrl$o", front->destination);
+            EV_INFO << "requesting" << endl;
+            Arbpkt * req = new Arbpkt();
+            req->setType(0);
+            req->setSourcePort(front->getSource());
+            req->setTargetOutport(front->getDestination());
+            send(req, "arbiterCtrl$o", front->getDestination());
             waiting = true;
-            arbiterWait = front->destination;
+            arbiterWait = front->getDestination();
+            EV_INFO << "waiting" << endl;
         }
     } else if (waiting) {
         if (msg->arrivedOn("arbiterCtrl$i", arbiterWait)) {

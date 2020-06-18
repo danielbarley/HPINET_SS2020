@@ -3,40 +3,26 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
 
-#ifndef __UEB04_INPORT_H_
-#define __UEB04_INPORT_H_
+#include "Outbuf.h"
 
-#include <omnetpp.h>
-#include "packet_m.h"
+Define_Module(Outbuf);
 
-using namespace omnetpp;
-
-/**
- * TODO - Generated class
- */
-class Inport : public cSimpleModule
+void Outbuf::initialize()
 {
-  protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    // TODO - Generated method body
+}
 
-  private:
-    cQueue fifo;
-    Packet * front;
-    double delay;
-    bool waiting = false;
-    unsigned int arbiterWait = 0;
-    bool granted = false;
-};
-
-#endif
+void Outbuf::handleMessage(cMessage *msg)
+{
+    // TODO - Generated method body
+}

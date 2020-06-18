@@ -4,7 +4,7 @@ build/%: %
 	cd $</src; make MODE=release all
 
 run/%: % build/%
-	cd $</simulations; ../$< -n .:../src
+	cd $</simulations; ../src/$< -n .:../src
 
 clean/%: %
 	cd $</; make clean

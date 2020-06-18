@@ -30,7 +30,7 @@ module Outport
     connections:
         for i=0..SIZE-1 {
             arbiterCtrl[i] <--> arbiter.ctrl[i];
-            in[i] <--> mux.in[i];
+            line[i] <--> mux.in[i];
         }
         mux.out --> outbuf.in;
         outbuf.out --> out;

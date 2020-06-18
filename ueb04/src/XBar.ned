@@ -21,7 +21,7 @@ module XBar
             @display("p=75,85");
         }
         outports[SIZE]: Outport {
-            SIZE = SZIE;
+            SIZE = SIZE;
             @display("p=200,85");
         }
     connections:
@@ -30,7 +30,7 @@ module XBar
             outports[i].out --> out[i];
         }
         for i=0..SIZE-1, for j=0..SIZE-1 {
-            inports[i].line[j] <--> C <--> outports[j].line[j]; // All to All
-            inports[i].arbiterCtrl[j] <--> outports[j].arbiterCtrl[j]; //Arbiter
+            inports[i].line[j] <--> C <--> outports[i].line[j]; // All to All
+            inports[i].arbiterCtrl[j] <--> outports[i].arbiterCtrl[j]; //Arbiter
         }
 }
