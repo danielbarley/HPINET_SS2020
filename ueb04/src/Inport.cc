@@ -14,7 +14,8 @@ void Inport::initialize() {
     sigQtime = registerSignal("sigQtime");
 
     WATCH(granted);
-    //WATCH(front);
+    WATCH(waiting);
+    WATCH(arbiterWait);
 }
 
 void Inport::requestArbitration(int sourcePort, int targetPort) {
@@ -22,7 +23,7 @@ void Inport::requestArbitration(int sourcePort, int targetPort) {
     req->setType(0);
     req->setSourcePort(sourcePort);
     req->setTargetOutport(targetPort);
-    EV_INFO << "requesting grant from arbiter " << targetPort << endl;
+    EV_INFO << "Inport (id=" << this->getId() << "): requesting grant from arbiter " << targetPort << endl;
     send(req, "arbiterCtrl$o", targetPort);
 
     waiting = true;
@@ -36,7 +37,7 @@ void Inport::releaseArbitration(int sourcePort, int targetPort) {
     rel->setType(2);
     rel->setTargetOutport(targetPort);
     rel->setSourcePort(sourcePort);
-    EV_INFO << "releasing grant from arbiter " << targetPort << endl;
+    EV_INFO << "Inport (id=" << this->getId() << "): releasing grant from arbiter " << targetPort << endl;
     send(rel, "arbiterCtrl$o", targetPort);
     granted = false;
 }
@@ -44,13 +45,13 @@ void Inport::releaseArbitration(int sourcePort, int targetPort) {
 void Inport::handleMessage(cMessage *msg) {
     emit(sigQlength, fifo.getLength());
     if (msg->isSelfMessage()) {  // timer interval and we can send
-        if (granted) {
-            simtime_t finishtime = gate("line$o", front->getDestination())
+        if (granted && front != nullptr) {
+            simtime_t finishtime = gate("line$o", arbiterWait)
                                        ->getTransmissionChannel()
                                        ->getTransmissionFinishTime();
 
             if (finishtime < simTime()) {
-                EV_INFO << "sending packet" << endl;
+                EV_INFO << "Inport (id=" << this->getId() << "): sending packet" << endl;
                 send(front, "line$o", front->getDestination());
                 front = nullptr;
 
@@ -73,32 +74,32 @@ void Inport::handleMessage(cMessage *msg) {
 
     } else if (msg->arrivedOn("in")) {
         if (dynamic_cast<Packet *>(msg) != nullptr) {
-            EV_INFO << "storing" << endl;
+            EV_INFO << "Inport (id=" << this->getId() << "): storing" << endl;
             fifo.insert(msg);
         } else {
             // not a Packet throw it away
-            EV_INFO << "got non packet message!" << endl;
+            EV_ERROR << "Inport (id=" << this->getId() << "): got non packet message!" << endl;
             delete msg;
         }
 
         if (!waiting) {
-            EV_INFO << "popping" << endl;
+            EV_INFO << "Inport (id=" << this->getId() << "): popping" << endl;
             front = dynamic_cast<Packet *>(fifo.pop());
             requestArbitration(front->getSource(), front->getDestination());
             waiting = true;
         }
     } else if (waiting && msg->arrivedOn("arbiterCtrl$i", arbiterWait)) {
-        EV_INFO << "got a grant from arbiter "
+        EV_INFO << "Inport (id=" << this->getId() << "): got a grant from arbiter "
                 << dynamic_cast<Arbpkt *>(msg)->getSourcePort() << endl;
         if (dynamic_cast<Arbpkt *>(msg)->getSourcePort() == arbiterWait) {
             granted = true;
             waiting = false;
         } else {
-            EV_INFO << "got a message from unexpected arbiter!" << endl;
+            EV_ERROR << "Inport (id=" << this->getId() << "): got a message from unexpected arbiter!" << endl;
         }
         delete msg;
     } else {
-        EV_INFO << "got a message?!" << endl;
+        EV_ERROR << "Inport (id=" << this->getId() << "): got a message?!" << endl;
         delete msg;
     }
 }

@@ -28,7 +28,7 @@ module XBar
     connections:
         for i=0..SIZE-1, for j=0..SIZE-1 {
             inports[i].line[j] <--> C <--> outports[i].line[j]; // All to All
-            inports[i].arbiterCtrl[j] <--> { @display("ls=,1,da"); } <--> outports[i].arbiterCtrl[j]; //Arbiter
+            inports[i].arbiterCtrl[j] <--> { @display("ls=,1,da"); } <--> outports[j].arbiterCtrl[i]; //Arbiter
         }
         for i=0..SIZE-1 {
             in[i] --> inports[i].in;

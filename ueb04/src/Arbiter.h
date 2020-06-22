@@ -15,6 +15,9 @@ class Arbiter : public cSimpleModule {
     bool processing = false;
     double delay;
     virtual void allowNext();
+
+    simsignal_t sigOutstandingRequests;
+    simsignal_t sigServiceTime;
 };
 
 #endif

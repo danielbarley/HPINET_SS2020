@@ -4,7 +4,7 @@ simple Buffer
 {
     parameters:
         int size = default(0);
-        double checkingDelay @unit(s) = default(1us);
+        double checkingDelay @unit(s) = default(100ns);
 
         @signal[sigNumInQueue](type=long);
         @signal[sigTimeInQueue](type=simtime_t);

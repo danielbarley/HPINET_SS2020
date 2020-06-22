@@ -184,6 +184,7 @@ Arbpkt::Arbpkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
     this->type = 0;
     this->sourcePort = 0;
     this->targetOutport = 0;
+    this->enqueued = 0;
 }
 
 Arbpkt::Arbpkt(const Arbpkt& other) : ::omnetpp::cPacket(other)
@@ -208,6 +209,7 @@ void Arbpkt::copy(const Arbpkt& other)
     this->type = other.type;
     this->sourcePort = other.sourcePort;
     this->targetOutport = other.targetOutport;
+    this->enqueued = other.enqueued;
 }
 
 void Arbpkt::parsimPack(omnetpp::cCommBuffer *b) const
@@ -216,6 +218,7 @@ void Arbpkt::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->type);
     doParsimPacking(b,this->sourcePort);
     doParsimPacking(b,this->targetOutport);
+    doParsimPacking(b,this->enqueued);
 }
 
 void Arbpkt::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -224,6 +227,7 @@ void Arbpkt::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->type);
     doParsimUnpacking(b,this->sourcePort);
     doParsimUnpacking(b,this->targetOutport);
+    doParsimUnpacking(b,this->enqueued);
 }
 
 unsigned int Arbpkt::getType() const
@@ -254,6 +258,16 @@ int Arbpkt::getTargetOutport() const
 void Arbpkt::setTargetOutport(int targetOutport)
 {
     this->targetOutport = targetOutport;
+}
+
+::omnetpp::simtime_t Arbpkt::getEnqueued() const
+{
+    return this->enqueued;
+}
+
+void Arbpkt::setEnqueued(::omnetpp::simtime_t enqueued)
+{
+    this->enqueued = enqueued;
 }
 
 class ArbpktDescriptor : public omnetpp::cClassDescriptor
@@ -321,7 +335,7 @@ const char *ArbpktDescriptor::getProperty(const char *propertyname) const
 int ArbpktDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount() : 3;
+    return basedesc ? 4+basedesc->getFieldCount() : 4;
 }
 
 unsigned int ArbpktDescriptor::getFieldTypeFlags(int field) const
@@ -336,8 +350,9 @@ unsigned int ArbpktDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *ArbpktDescriptor::getFieldName(int field) const
@@ -352,8 +367,9 @@ const char *ArbpktDescriptor::getFieldName(int field) const
         "type",
         "sourcePort",
         "targetOutport",
+        "enqueued",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<4) ? fieldNames[field] : nullptr;
 }
 
 int ArbpktDescriptor::findField(const char *fieldName) const
@@ -363,6 +379,7 @@ int ArbpktDescriptor::findField(const char *fieldName) const
     if (fieldName[0]=='t' && strcmp(fieldName, "type")==0) return base+0;
     if (fieldName[0]=='s' && strcmp(fieldName, "sourcePort")==0) return base+1;
     if (fieldName[0]=='t' && strcmp(fieldName, "targetOutport")==0) return base+2;
+    if (fieldName[0]=='e' && strcmp(fieldName, "enqueued")==0) return base+3;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -378,8 +395,9 @@ const char *ArbpktDescriptor::getFieldTypeString(int field) const
         "unsigned int",
         "int",
         "int",
+        "simtime_t",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **ArbpktDescriptor::getFieldPropertyNames(int field) const
@@ -449,6 +467,7 @@ std::string ArbpktDescriptor::getFieldValueAsString(void *object, int field, int
         case 0: return ulong2string(pp->getType());
         case 1: return long2string(pp->getSourcePort());
         case 2: return long2string(pp->getTargetOutport());
+        case 3: return simtime2string(pp->getEnqueued());
         default: return "";
     }
 }
@@ -466,6 +485,7 @@ bool ArbpktDescriptor::setFieldValueAsString(void *object, int field, int i, con
         case 0: pp->setType(string2ulong(value)); return true;
         case 1: pp->setSourcePort(string2long(value)); return true;
         case 2: pp->setTargetOutport(string2long(value)); return true;
+        case 3: pp->setEnqueued(string2simtime(value)); return true;
         default: return false;
     }
 }

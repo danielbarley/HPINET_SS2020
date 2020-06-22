@@ -26,6 +26,7 @@
  *     unsigned int type;
  *     int sourcePort;
  *     int targetOutport;
+ *     simtime_t enqueued;
  * }
  * </pre>
  */
@@ -35,6 +36,7 @@ class Arbpkt : public ::omnetpp::cPacket
     unsigned int type;
     int sourcePort;
     int targetOutport;
+    ::omnetpp::simtime_t enqueued;
 
   private:
     void copy(const Arbpkt& other);
@@ -59,6 +61,8 @@ class Arbpkt : public ::omnetpp::cPacket
     virtual void setSourcePort(int sourcePort);
     virtual int getTargetOutport() const;
     virtual void setTargetOutport(int targetOutport);
+    virtual ::omnetpp::simtime_t getEnqueued() const;
+    virtual void setEnqueued(::omnetpp::simtime_t enqueued);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const Arbpkt& obj) {obj.parsimPack(b);}

@@ -40,6 +40,7 @@ class Inport : public cSimpleModule
     unsigned int arbiterWait = 0;
     unsigned int sourceWait = 0;
     bool waiting = false;
+
     bool granted = false;
     simsignal_t sigQlength;
     simsignal_t sigQtime;

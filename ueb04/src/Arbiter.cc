@@ -8,10 +8,17 @@ void Arbiter::initialize() {
     delay = static_cast<double>(par("checkingDelay"));
 
     scheduleAt(simTime(), new cMessage);
+
+    //stats
+    sigServiceTime = registerSignal("sigServiceTime");
+    sigOutstandingRequests = registerSignal("sigOutstandingRequests");
+    emit(sigOutstandingRequests, 0);
 }
 
 void Arbiter::allowNext() {
     Arbpkt * req = dynamic_cast<Arbpkt *>(waitingRequests.pop());
+    emit(sigOutstandingRequests, waitingRequests.getLength());
+    emit(sigServiceTime, simTime() - req->getEnqueued());
     Arbpkt * grant = new Arbpkt();
     grant->setType(1);
     grant->setSourcePort(req->getTargetOutport());
@@ -23,12 +30,12 @@ void Arbiter::allowNext() {
 
 void Arbiter::handleMessage(cMessage *msg) {
     if (msg->arrivedOn("ctrl$i") && dynamic_cast<Arbpkt *>(msg) != nullptr) {
-//        EV_INFO << "got request from " << dynamic_cast<Arbpkt *>(msg)->getSourcePort() << endl;
-        //delete msg;
         if (dynamic_cast<Arbpkt *>(msg)->getType() == 0) {
             EV_INFO << "received request for grant on port "
                         << dynamic_cast<Arbpkt *>(msg)->getSourcePort() <<  endl;
+            dynamic_cast<Arbpkt *>(msg)->setEnqueued(simTime());
             waitingRequests.insert(msg);
+            emit(sigOutstandingRequests, waitingRequests.getLength());
         } else if (dynamic_cast<Arbpkt *>(msg)->getType() == 2) {
             if (waitingRequests.getLength() > 0) {
                 allowNext();
