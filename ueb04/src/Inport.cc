@@ -14,6 +14,7 @@ void Inport::initialize() {
     sigQtime = registerSignal("sigQtime");
 
     WATCH(granted);
+    //WATCH(front);
 }
 
 void Inport::requestArbitration(int sourcePort, int targetPort) {
@@ -51,6 +52,7 @@ void Inport::handleMessage(cMessage *msg) {
             if (finishtime < simTime()) {
                 EV_INFO << "sending packet" << endl;
                 send(front, "line$o", front->getDestination());
+                front = nullptr;
 
                 if (fifo.getLength() > 0) {  // fifo has packages
                     front = dynamic_cast<Packet *>(fifo.pop());
@@ -85,7 +87,7 @@ void Inport::handleMessage(cMessage *msg) {
             requestArbitration(front->getSource(), front->getDestination());
             waiting = true;
         }
-    } else if (waiting && msg->arrivedOn("arbiterCtrl$i")) {
+    } else if (waiting && msg->arrivedOn("arbiterCtrl$i", arbiterWait)) {
         EV_INFO << "got a grant from arbiter "
                 << dynamic_cast<Arbpkt *>(msg)->getSourcePort() << endl;
         if (dynamic_cast<Arbpkt *>(msg)->getSourcePort() == arbiterWait) {
