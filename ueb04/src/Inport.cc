@@ -38,6 +38,7 @@ void Inport::handleMessage(cMessage *msg) {
             	send(front, "line$o", front->getDestination());
 				if (fifo.getLength() > 0) { // fifo has packages
 					front = dynamic_cast<Packet *>(fifo.pop());
+					emit(sigQtime, simTime() - front->getEnqueued());
 					if (front->getDestination() != arbiterWait) { // changing direction
 						Arbpkt * req = new Arbpkt();
 						req->setType(0);
