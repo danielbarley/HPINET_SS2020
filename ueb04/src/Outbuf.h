@@ -12,6 +12,8 @@ class Outbuf : public cSimpleModule {
   private:
     cQueue fifo;
     double delay;
+    simsignal_t sigQlength;
+    simsignal_t sigQtime;
 };
 
 #endif
