@@ -23,6 +23,9 @@ void Inport::initialize() {
     fifo = cQueue("inport_buffer");
     delay = static_cast<double>(par("checkingDelay"));
     scheduleAt(simTime(), new cMessage); // timer event for checking line$o
+
+    sigQlength = registerSignal("sigQlength");
+    sigQtime = registerSignal("sigQtime");
 }
 
 void Inport::handleMessage(cMessage *msg) {

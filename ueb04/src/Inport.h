@@ -37,6 +37,8 @@ class Inport : public cSimpleModule
     bool waiting = false;
     unsigned int arbiterWait = 0;
     bool granted = false;
+    simsignal_t sigQlength;
+    simsignal_t sigQtime;
 };
 
 #endif
