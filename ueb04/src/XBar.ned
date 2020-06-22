@@ -18,19 +18,21 @@ module XBar
     submodules:
         inports[SIZE]: Inport {
             SIZE = SIZE;
-            @display("p=75,85");
+            @display("p=50,62");
         }
         outports[SIZE]: Outport {
             SIZE = SIZE;
-            @display("p=200,85");
+            @display("p=177,62");
         }
+
     connections:
+        for i=0..SIZE-1, for j=0..SIZE-1 {
+            inports[i].line[j] <--> C <--> outports[i].line[j]; // All to All
+            inports[i].arbiterCtrl[j] <--> { @display("ls=,1,da"); } <--> outports[i].arbiterCtrl[j]; //Arbiter
+        }
         for i=0..SIZE-1 {
             in[i] --> inports[i].in;
             outports[i].out --> out[i];
         }
-        for i=0..SIZE-1, for j=0..SIZE-1 {
-            inports[i].line[j] <--> C <--> outports[i].line[j]; // All to All
-            inports[i].arbiterCtrl[j] <--> outports[i].arbiterCtrl[j]; //Arbiter
-        }
+
 }

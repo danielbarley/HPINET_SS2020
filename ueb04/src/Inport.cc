@@ -32,21 +32,31 @@ void Inport::handleMessage(cMessage *msg) {
     emit(sigQlength, fifo.getLength());
     if (msg->isSelfMessage()) { //timer interval and we can send
         if (granted) {
-            send(front, "line$o", front->getDestination());
-            if (fifo.getLength() > 0) { // fifo has packages
-                front = dynamic_cast<Packet *>(fifo.pop());
-                if (front->getDestination() != arbiterWait) { // changing direction
-                    Arbpkt * rel = new Arbpkt();
-                    rel->setType(0);
-                    rel->setSourcePort(front->getSource());
-                    rel->setTargetOutport(front->getDestination());
-                    send(rel, "arbiterCtrl$o", front->getDestination());
-                    granted = false;
-                }
-            } else {
-                cMessage * req = new cMessage();
-                send(req, "arbiterCtrl$o", front->getDestination());
-                granted = false;
+            simtime_t finishtime = gate("line$o", front->getDestination())->getTransmissionChannel()->getTransmissionFinishTime();
+            if (finishtime < simTime()) {
+                EV_INFO << "sending packet" << endl;
+            	send(front, "line$o", front->getDestination());
+				if (fifo.getLength() > 0) { // fifo has packages
+					front = dynamic_cast<Packet *>(fifo.pop());
+					if (front->getDestination() != arbiterWait) { // changing direction
+						Arbpkt * req = new Arbpkt();
+						req->setType(0);
+						req->setSourcePort(front->getSource());
+						req->setTargetOutport(front->getDestination());
+						send(req, "arbiterCtrl$o", front->getDestination());
+						granted = false;
+						arbiterWait = front->getDestination();
+						sourceWait = front->getSource();
+					}
+				} else {
+					Arbpkt * rel = new Arbpkt();
+					rel->setType(2);
+					rel->setTargetOutport(arbiterWait);
+					rel->setSourcePort(sourceWait);
+					EV_INFO << "releasing grant from arbiter " << arbiterWait << endl;
+					send(rel, "arbiterCtrl$o", front->getDestination());
+					granted = false;
+				}
             }
         }
         scheduleAt(simTime() + delay, msg); // recheck in delay seconds
@@ -63,19 +73,19 @@ void Inport::handleMessage(cMessage *msg) {
         if (!waiting) {
             EV_INFO << "popping" << endl;
             front = dynamic_cast<Packet *>(fifo.pop());
-            EV_INFO << "requesting" << endl;
+            EV_INFO << "requesting  for arbiter "<< front->getDestination() << endl;
             Arbpkt * req = new Arbpkt();
             req->setType(0);
             req->setSourcePort(front->getSource());
             req->setTargetOutport(front->getDestination());
-            send(req, "arbiterCtrl$o", front->getDestination());
             waiting = true;
             arbiterWait = front->getDestination();
+            send(req, "arbiterCtrl$o", front->getDestination());
             EV_INFO << "waiting" << endl;
         }
-    } else if (waiting) {
-        if (msg->arrivedOn("arbiterCtrl$i", arbiterWait)) {
-            EV_INFO << "got a grant from arbiter " << arbiterWait << endl;
+    } else if (waiting && msg->arrivedOn("arbiterCtrl$i")) {
+        EV_INFO << "got a grant from arbiter " << dynamic_cast<Arbpkt *>(msg)->getSourcePort() << endl;
+        if (dynamic_cast<Arbpkt *>(msg)->getSourcePort() == arbiterWait) {
             granted = true;
             waiting = false;
         } else {

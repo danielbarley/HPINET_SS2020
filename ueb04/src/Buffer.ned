@@ -6,8 +6,8 @@ simple Buffer
         int size = default(0);
         double checkingDelay @unit(s) = default(1us);
 
-        @signal[sigNumInQueue](type=int);
-        @signal[sigTimeInQueue](type=int);
+        @signal[sigNumInQueue](type=long);
+        @signal[sigTimeInQueue](type=simtime_t);
         @signal[sigNumDiscarded](type=bool);
         @signal[sigBusyLine](type=bool);
 

@@ -15,6 +15,8 @@ network NetXBar
 		}
     submodules:
         node[NUM_NODES]: Node {
+            nodeID = index;
+            numNodes = NUM_NODES;
         };
         xbar: XBar {};
 
