@@ -3,7 +3,7 @@ package ueb04;
 simple Inport {
     parameters:
         int SIZE = default(4);
-        double checkingDelay @unit(s)= default(1us);
+        double checkingDelay @unit(s)= default(100ns);
         @signal[sigQlength](type=long);
         @signal[sigQtime](type=double);
 		@statistic[statQlength](

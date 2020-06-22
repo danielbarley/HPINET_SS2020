@@ -20,6 +20,7 @@ void App::handleMessage(cMessage *msg) {
         int destination = intuniform(0, numNodes - 1);
         int64_t packetLength = intuniform(1, 64) * 64; // bytes
         Packet *pkt = new Packet;
+        pkt->setSource(nodeID);
         pkt->setDestination(destination);
         pkt->setBitLength(packetLength);
         send(pkt, "data_out");

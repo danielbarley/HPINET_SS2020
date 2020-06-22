@@ -22,7 +22,7 @@ void Mux::initialize()
     // TODO - Generated method body
 }
 
-void Mux::handleMessage(cMessage *msg)
-{
-    // TODO - Generated method body
+void Mux::handleMessage(cMessage *msg) {
+    EV_INFO << "received packet" << endl;
+    delete msg;
 }

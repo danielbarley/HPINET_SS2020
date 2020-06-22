@@ -5,12 +5,16 @@ import ueb04.Buffer;
 
 module Node
 {
+    parameters:
+        int nodeID;
+        int numNodes;
     gates:
         inout line;
     submodules:
         app: App {
             @display("p=26,60");
-            numNodes = 2;
+            numNodes = numNodes;
+            nodeID = nodeID;
         }
         buffer: Buffer {
             @display("p=92,60");
