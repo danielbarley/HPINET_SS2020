@@ -31,12 +31,15 @@ class Inport : public cSimpleModule
     virtual void handleMessage(cMessage *msg);
 
   private:
+    void requestArbitration(int, int);
+    void releaseArbitration(int, int);
+
     cQueue fifo;
     Packet * front;
     double delay;
-    bool waiting = false;
     unsigned int arbiterWait = 0;
     unsigned int sourceWait = 0;
+    bool waiting = false;
     bool granted = false;
     simsignal_t sigQlength;
     simsignal_t sigQtime;
