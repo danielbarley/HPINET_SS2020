@@ -29,6 +29,7 @@ void Inport::initialize() {
 }
 
 void Inport::handleMessage(cMessage *msg) {
+    emit(sigQlength, fifo.getLength());
     if (msg->isSelfMessage()) { //timer interval and we can send
         if (granted) {
             simtime_t finishtime = gate("line$o", front->getDestination())->getTransmissionChannel()->getTransmissionFinishTime();
