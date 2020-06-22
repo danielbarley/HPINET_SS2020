@@ -52,12 +52,13 @@ void Inport::handleMessage(cMessage *msg) {
 
             if (finishtime < simTime()) {
                 EV_INFO << "Inport (id=" << this->getId() << "): sending packet" << endl;
+
+                emit(sigQtime, simTime() - front->getEnqueued());
                 send(front, "line$o", front->getDestination());
                 front = nullptr;
 
                 if (fifo.getLength() > 0) {  // fifo has packages
                     front = dynamic_cast<Packet *>(fifo.pop());
-                    emit(sigQtime, simTime() - front->getEnqueued());
 
                     if (front->getDestination() !=
                         arbiterWait) {  // changing direction
