@@ -1,0 +1,78 @@
+\documentclass[]{scrartcl}
+\usepackage{Preamble}
+\usepackage{amsmath}
+
+\renewcommand{\exercise}{Exercise 5}
+\renewcommand{\duedate}{2020-07-06, 18:00}
+
+\begin{document}
+    \section{Simulations}
+    \subsection{4x4 Crossbar}
+    \begin{verbatim}
+        Bestimmen und begründen Sie wie die Werte zustande kommen
+    \end{verbatim}
+
+    \begin{itemize}
+        \item \verb|avg Input Queue Length|
+            \begin{itemize}
+                \item Generated Packets
+                    \begin{itemize}
+                        \item size: $ s = \SI{512}{b}$
+                        \item send interval: $ t = \text{uniform}(\SI{1}{\mu s}, \SI{10}{\mu s}) = \SI{5.5}{\mu s}$
+                    \end{itemize}
+                \item Connection to XBar
+                    \begin{itemize}
+                        \item datarate: $\SI{1}{Gbps}$
+                    \end{itemize}
+            \end{itemize}
+
+        \begin{align}
+            r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}}
+            \rightarrow l_\text{q,avg} = 0
+        \end{align}
+
+        \item \verb|avg End-to-End Latency|
+            \begin{itemize}
+                \item (no delays inside buffers, because the generated datarate, even for all 4 apps, is lower than a single datarate channels maximumthroughput)
+                \item minimum
+                    \begin{itemize}
+                        \item \verb|App --> C --> Inport --> C --> Outport --> C --> App|
+                        \item delay for packet: $t_{delay}=512ns$ (per DatarateChannel C)
+                        \item[$\Rightarrow$] $t_{e2e,min} = \SI{1.536}{\mu s}$
+                    \end{itemize}
+                \item maximum
+                    \begin{itemize}
+                        \item all apps send to same destinatino and arbiter has to do round robin for all packets \textrightarrow 4 times the dely for the Datarate Cahnnel inside XBar
+                        \item[$\Rightarrow$] $t_{e2e, max} = \SI{3.027}{\mu s}$
+                    \end{itemize}
+                \item on avg, the mimal case is 7 times more likely.
+
+                    The minimal case can exist in 24 possible constellations (connecting each app to a different app).
+                    While the maximum case can only exist in 4 possible constellations (all apps sending to one of 4 apps).
+
+                    \[\Rightarrow t_{e2e, avg} \approx \left( 24\cdot t_{e2e,min} + 4\cdot t_{e2e,max}\right)/28 = \SI{1.7}{\mu s} \]
+
+                    (This is a coarse estimation, otherwise the cases inbetween need to be consudered)
+            \end{itemize}
+        \item \verb|avg Arbiter Request Queue Length|
+            \begin{itemize}
+                \item minimum
+                    \begin{itemize}
+                        \item queue is empty, because all arbitration requests can be fulfilled instantly
+                        \item[$\Rightarrow$] $l_{arbq,min} = 0$
+                    \end{itemize}
+                \item maximum
+                    \begin{itemize}
+                        \item que is filled with 3 waiting requests, because all apps are wanting to send their packets to the same output port
+                        \item[$\Rightarrow$] $l_{arbq,max} = 3$
+                    \end{itemize}
+                \item on avg (analogously to $t_{e2e}$)
+                    
+                    \[\Rightarrow l_{arbq,avg} \approx \left(24\cdot 0+4\cdot 3 \right)/28 = 0.42\]
+            \end{itemize}
+        \item \verb|avg Arbiter Request Queue Time|
+            ((36 * 512) + (8 * 1024) + (4 * 1536))/92
+        \item \verb|avg Output Buffer Queue Length|
+        \item \verb|avg Throughput|
+    \end{itemize}
+\end{document}
