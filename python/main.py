@@ -32,4 +32,5 @@ plt.hist(
     bins=16
 )
 
+
 plt.savefig(args.out_file)
