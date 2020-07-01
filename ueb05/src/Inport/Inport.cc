@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #include "Inport.h"
 
@@ -19,11 +19,14 @@ Define_Module(Inport);
 
 Inport::~Inport() {
     cancelAndDelete(createRelease);
-    delete buffer;
+    //delete buffer;
 }
 
 void Inport::initialize() {
-    buffer = new cQueue("PktStore");
+    //buffer = new cQueue("PktStore");
+    for (int virt = 0; virt < static_cast<int>(par("numPorts")); virt++)
+        buffer.push_back(cQueue(("PktStore" + std::to_string(virt)).c_str()));
+
     createRelease = new ReqGrant("Create Release");
 
     qlen = registerSignal("qlen");
@@ -34,10 +37,9 @@ void Inport::initialize() {
 
 void Inport::handleMessage(cMessage *msg) {
     if (msg->arrivedOn("in")) {
-        if (!reqActive) {
-
-            Packet *pkt = check_and_cast<Packet*>(msg);
-            int dest = pkt->getDestination();
+        Packet *pkt = check_and_cast<Packet*>(msg);
+        int dest = pkt->getDestination();
+        if (!reqActive[dest]) {
             int src = pkt->getSource();
             std::stringstream ss;
             ss << "Req from " << src;
@@ -52,19 +54,18 @@ void Inport::handleMessage(cMessage *msg) {
             send(req, "arbiterCtrl$o", dest);
 
             msg->setTimestamp();
-            buffer->insert(msg);
+            buffer[dest].insert(msg);
 
             //one packet is temporary stored, so "real" qsize is one less
-            emit(qlen, buffer->getLength());
-
-            reqActive = true;
+            emit(qlen, buffer[dest].getLength());
+            reqActive[dest] = true;
         } else {
             msg->setTimestamp();
-            buffer->insert(msg);
+            buffer[dest].insert(msg);
             EV_INFO << "Requests are outstanding. Queue Request" << endl;
-            EV_INFO << "Request waiting: " << buffer->getLength() << endl;
+            EV_INFO << "Request waiting: " << buffer[dest].getLength() << endl;
             //one packet is temporary stored, so "real" qsize is one less
-            emit(qlen, buffer->getLength());
+            emit(qlen, buffer[dest].getLength());
         }
     } else if (msg->arrivedOn("arbiterCtrl$i")) {
         ReqGrant *rg = check_and_cast<ReqGrant*>(msg);
@@ -72,7 +73,8 @@ void Inport::handleMessage(cMessage *msg) {
             EV_ERROR << "Received something other than a grant in an inport!"
                             << std::endl;
         }
-        Packet *pkt = check_and_cast<Packet*>(buffer->pop());
+        Packet *pkt = check_and_cast<Packet *>(
+            buffer[msg->getArrivalGate()->getIndex()].pop());
         emit(qtime, simTime() - pkt->getTimestamp());
         int dest = pkt->getDestination();
 
@@ -91,7 +93,7 @@ void Inport::handleMessage(cMessage *msg) {
         delete msg;
 
         //one packet is temporary stored, so "real" qsize is one less
-        emit(qlen, buffer->getLength());
+        emit(qlen, buffer[dest].getLength());
     } else {
         // self messages
         if (msg == createRelease) {
@@ -108,13 +110,13 @@ void Inport::handleMessage(cMessage *msg) {
 
             send(rel, "arbiterCtrl$o", dest);
 
-            if (buffer->isEmpty()) {
-                reqActive = false;
+            if (buffer[dest].isEmpty()) {
+                reqActive[dest] = false;
                 EV_INFO << "No Requests are waiting." << endl;
 
             } else {
                 //outstanding requests in buffer
-                Packet *pkt = check_and_cast<Packet*>(buffer->front());
+                Packet *pkt = check_and_cast<Packet*>(buffer[dest].front());
                 int dest = pkt->getDestination();
                 int src = pkt->getSource();
                 std::stringstream ss;
@@ -129,7 +131,7 @@ void Inport::handleMessage(cMessage *msg) {
                          << dest << " from queue" << endl;
 
                 send(req, "arbiterCtrl$o", dest);
-                reqActive = true;
+                reqActive[dest] = true;
             }
         }
     }

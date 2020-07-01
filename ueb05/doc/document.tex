@@ -12,13 +12,17 @@
         Bestimmen und begründen Sie wie die Werte zustande kommen
     \end{verbatim}
 
+    \begin{equation}
+        Avg = \sum_{n=0}^N \frac{\binom{N}{n}\left( N-n+1 \right)! \cdot C_n }{\sum_{k=0}^N \binom{N}{k}\left( N-k+1 \right)!}
+    \end{equation}
+
     \begin{itemize}
         \item \verb|avg Input Queue Length|
             \begin{itemize}
                 \item Generated Packets
                     \begin{itemize}
                         \item size: $ s = \SI{512}{b}$
-                        \item send interval: $ t = \text{uniform}(\SI{1}{\mu s}, \SI{10}{\mu s}) = \SI{5.5}{\mu s}$
+                        \item send interval: $ t = \SI{512}{ns}$
                     \end{itemize}
                 \item Connection to XBar
                     \begin{itemize}
@@ -27,8 +31,11 @@
             \end{itemize}
 
         \begin{align}
-            r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}}\\
-            \Rightarrow l_\text{q,avg} = 0
+            r_\text{gen} &= \frac{\SI{512}{b}}{\SI{512}{ns}} = \SI{1}{Gbps}\\
+            C_n &= \SI{250}{Mbps}\cdot n\\
+            r_\text{q fill,eff} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
+                               &= \SI{347.5}{Mbps}\\
+            \Rightarrow l_\text{q,avg} &= \frac{t_\text{sim}\cdot r_\text{q fill, eff}}{2\cdot s} = 3394
         \end{align}
 
         \item \verb|avg End-to-End Latency|
@@ -45,46 +52,90 @@
                     \end{itemize}
                 \item maximum
 
-                    all apps send to same destinatino and arbiter has to do round robin for all packets $\rightarrow$ 4 times the delay for the datarate channel inside XBar
-                    \begin{equation}
-                        \Rightarrow t_{e2e, max} = \SI{3.027}{\mu s}
-                    \end{equation}
+                    at end of simulation, inport buffer full, all in to one out
 
-                \item on avg, the mimal case is 7 times more likely.
+                    \begin{align}
+                        l_{inport q, max} &= 7031\\
+                        r_{dequeue, min} &= \SI{250}{Mbps}\\
+                        t_\text{in queue, max} &= \frac{t_{q,inport}\cdot s}{r_{dequeue}} = \SI{3.599}{ms}\\
+                    \end{align}
 
-                    The minimal case can exist in 24 possible constellations (connecting each app to a different app).
-                    While the maximum case can only exist in 4 possible constellations (all apps sending to one of 4 apps).
+                \item on avg
+                    \begin{align}
+                        t_\text{e2e, avg} &= t_\text{in queue, max} / 2 = \SI{1.8}{ms}
+                    \end{align}
 
-                    \begin{equation}
-                        \Rightarrow t_{e2e, avg} \approx \left( 24\cdot t_{e2e,min} + 4\cdot t_{e2e,max}\right)/28 = \SI{1.7}{\mu s}
-                    \end{equation}
-
-                    (This is a coarse estimation, otherwise the cases inbetween need to be consudered)
             \end{itemize}
         \item \verb|avg Arbiter Request Queue Length|
             \begin{itemize}
-                \item minimum
-                    \begin{itemize}
-                        \item queue is empty, because all arbitration requests can be fulfilled instantly
-                            \begin{equation}
-                                l_{arbq,min} = 0
-                            \end{equation}
-                    \end{itemize}
-                \item maximum
-                    \begin{itemize}
-                        \item que is filled with 3 waiting requests, because all apps are wanting to send their packets to the same output port
-                            \begin{equation}
-                                l_{arbq,max} = 3
-                            \end{equation}
-                    \end{itemize}
+                \item cases
+                    \begin{align}
+                        C_n &= n-1 \qquad 1\leq n\leq4=N
+                    \end{align}
                 \item on avg (analogously to $t_{e2e}$)
                     \begin{equation}
-                        \Rightarrow l_{arbq,avg} \approx \left(24\cdot 0+4\cdot 3 \right)/28 = 0.42
+                        \Rightarrow l_{arbq,avg} = \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141} = 0.39
                     \end{equation}
             \end{itemize}
         \item \verb|avg Arbiter Request Queue Time|
-            ((36 * 512) + (8 * 1024) + (4 * 1536))/92
+            \begin{itemize}
+                \item cases
+                    \begin{align}
+                        C_n &= \SI{512}{ns} * n
+                    \end{align}
+                \item on avg
+                    \begin{align}
+                        \Rightarrow t_{arbq,avg} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
+                                                 &= 
+                    \end{align}
+            \end{itemize}
         \item \verb|avg Output Buffer Queue Length|
+            \begin{itemize}
+                \item Generated Packets
+                    \begin{itemize}
+                        \item size: $ s = \SI{512}{b}$
+                        \item send interval: $ t = \text{uniform}(\SI{1}{\mu s}, \SI{10}{\mu s}) = \SI{5.5}{\mu s}$
+                    \end{itemize}
+                \item Connection to and in XBar
+                    \begin{itemize}
+                        \item data rate: $\SI{1}{Gbps}$
+                    \end{itemize}
+            \end{itemize}
+            \begin{align}
+                r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}} = \SI{93}{Mbps}\\
+                \Rightarrow l_\text{q,avg} = 0
+            \end{align}
         \item \verb|avg Throughput|
+
+            input and output buffers always empty
+            \begin{align}
+                r_{cross} &= 4*r_\text{gen}\\
+                &= \SI{372}{Mbps}
+            \end{align}
     \end{itemize}
+    \subsection{Throughput vs. Ports}
+    \begin{itemize}
+        \item with ourr formula 
+            {0.6, 0.44, 0.347518, 0.286498, 0.243324, 0.211277, 0.186604, 0.167047, 0.151176, 0.138045,
+
+>    0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396,
+
+>    0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485,
+
+>    0.0519832, 0.0503302, 0.048779}
+    \end{itemize}
+    \subsection{Throughput vs. Injection Rate}
+    \begin{itemize}
+        \item not in saturation until delay $\leq \SI{832}{ns}$
+        \item saturation pont $r_{sat} = \frac{\SI{512}{b}}{\SI{832}{ns}} = \SI{615}{Mbps}$
+        \item The main reason will be the arbiter. It can only process packets at about \SI{600}{Mbps} on avg., therefore bottlenecking the rest of the system
+    \end{itemize}
+    \subsection{Throughput vs. Bandwidth}
+    \begin{itemize}
+        \item Network in aturation until Bandwith $> \SI{1600}{Mbps}$
+        \item throughput at saturation point $r_{sat} = \SI{1}{Gbps}$
+        \item If the Arbiter can only work at 62\% of the bandwidth, we reach this saturation point if 62\% of the bandwidth is \SI{1}{Gbps}, therefore the required bandwith is \SI{1613}{Gbps}
+    \end{itemize}
+\section{Optimizations}
+
 \end{document}
