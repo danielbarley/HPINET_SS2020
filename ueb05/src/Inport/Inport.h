@@ -36,7 +36,7 @@ class Inport : public cSimpleModule
   private:
     std::vector<bool> reqActive;
     std::vector<cQueue> buffer;
-    ReqGrant *createRelease;
+    std::vector<ReqGrant *> createRelease;
 
     simsignal_t qlen;
     simsignal_t qtime;

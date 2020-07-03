@@ -18,16 +18,20 @@
 Define_Module(Inport);
 
 Inport::~Inport() {
-    cancelAndDelete(createRelease);
+    for (auto re: createRelease) {
+        cancelAndDelete(re);
+    }
     //delete buffer;
 }
 
 void Inport::initialize() {
     //buffer = new cQueue("PktStore");
-    for (int virt = 0; virt < static_cast<int>(par("numPorts")); virt++)
+    //createRelease = new ReqGrant("Create Release");
+    for (int virt = 0; virt < static_cast<int>(par("numPorts")); virt++) {
         buffer.push_back(cQueue(("PktStore" + std::to_string(virt)).c_str()));
-
-    createRelease = new ReqGrant("Create Release");
+        reqActive.push_back(false);
+        createRelease.push_back(new ReqGrant("createRelease"));
+    }
 
     qlen = registerSignal("qlen");
     qtime = registerSignal("qtime");
@@ -84,23 +88,25 @@ void Inport::handleMessage(cMessage *msg) {
         simtime_t duration = pkt->getDuration();
         //simtime_t duration = gate("outp",dest)->getTransmissionChannel()->getTransmissionFinishTime();
 
-        createRelease->setOutports(dest);
+        createRelease[dest]->setOutports(dest);
 
         EV_INFO << "Packet duration is: " << duration * 1000000 << "us" << endl;
         //EV_INFO << "Received Grant. Packet duration is: " << (duration - simTime()) * 1000000 << endl;
 
-        scheduleAt(simTime() + duration, createRelease);
+        scheduleAt(simTime() + duration, createRelease[dest]);
         delete msg;
 
         //one packet is temporary stored, so "real" qsize is one less
         emit(qlen, buffer[dest].getLength());
     } else {
         // self messages
-        if (msg == createRelease) {
+        //if (msg == createRelease[]) {
+        if (check_and_cast<ReqGrant *>(msg) != nullptr) {
 
             ReqGrant *rel = new ReqGrant("Release");
 
-            int dest = createRelease->getOutports();
+            //int dest = createRelease->getOutports();
+            int dest = check_and_cast<ReqGrant *>(msg)->getOutports();
 
             EV_INFO << "Transfer complete. Send Release to arbiter= " << dest
                            << endl;
