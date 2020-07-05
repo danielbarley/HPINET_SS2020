@@ -115,28 +115,47 @@
     \end{itemize}
     \subsection{Throughput vs. Ports}
     \begin{itemize}
-        \item with ourr formula
+        \item with our formula
             {0.6, 0.44, 0.347518, 0.286498, 0.243324, 0.211277, 0.186604, 0.167047, 0.151176, 0.138045,
 
->    0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396,
+    0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396,
 
->    0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485,
+    0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485,
 
->    0.0519832, 0.0503302, 0.048779}
+    0.0519832, 0.0503302, 0.048779}
     \end{itemize}
     \subsection{Throughput vs. Injection Rate}
     \begin{itemize}
         \item not in saturation until delay $\leq \SI{832}{ns}$
-        \item saturation pont $r_{sat} = \frac{\SI{512}{b}}{\SI{832}{ns}} = \SI{615}{Mbps}$
+        \item saturation point $r_{sat} = \frac{\SI{512}{b}}{\SI{832}{ns}} = \SI{615}{Mbps}$
         \item The main reason will be the arbiter. It can only process packets at about \SI{600}{Mbps} on avg., therefore bottlenecking the rest of the system
     \end{itemize}
     \subsection{Throughput vs. Bandwidth}
     \begin{itemize}
-        \item Network in aturation until Bandwith $> \SI{1600}{Mbps}$
+        \item Network in saturation until bandwidth $> \SI{1600}{Mbps}$
         \item throughput at saturation point $r_{sat} = \SI{1}{Gbps}$
-        \item If the Arbiter can only work at 62\% of the bandwidth, we reach this saturation point if 62\% of the bandwidth is \SI{1}{Gbps}, therefore the required bandwith is \SI{1613}{Gbps}
+        \item If the Arbiter can only work at $\approx$ 62\% of the bandwidth, we reach this saturation point if 62\% of the bandwidth is \SI{1}{Gbps}, therefore the required bandwith is \SI{1613}{Gbps}
     \end{itemize}
 \section{Optimizations}
+\subsection{Problems}
+In the previous exercise we determined the arbiter to be the limiting resource.
+We determined head of line blocking to be a limiting factor for performance.
+Since packets are sent to random nodes it is very likely for a packet having to
+wait because the route is currently occupied even though other packets in queue
+could be routed.
+Therefore virtual queues were implemented.
+
+\subsection{Solution}
+We can measure the performance gain in correlation to the average inport buffer
+length which is decreased by two orders of magnitude. Form around 3000 to around
+15
+
+\subsection{Problems In Real Hardware}
+In a real hardware setting this would increase complexity.
+Either distinct buffers have to be used or some sort of control logic that holds
+pointers to the virtual queues. Spatial constraints have to be taken into account
+as well as scalability. With more possible routing decisions the number of virtual
+queues also rises.
 
 \begin{figure}[ht]
     \centering
