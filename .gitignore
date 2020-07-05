@@ -34,6 +34,7 @@
 # OMNeT++
 .cmdenv-log
 ueb*/simulations/results/
+!ueb*/simulations/results/*.pdf
 ueb*/out/
 /.metadata/
 ueb*/**/Makefile

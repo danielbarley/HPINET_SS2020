@@ -25,8 +25,6 @@ Inport::~Inport() {
 }
 
 void Inport::initialize() {
-    //buffer = new cQueue("PktStore");
-    //createRelease = new ReqGrant("Create Release");
     for (int virt = 0; virt < static_cast<int>(par("numPorts")); virt++) {
         buffer.push_back(cQueue(("PktStore" + std::to_string(virt)).c_str()));
         reqActive.push_back(false);
