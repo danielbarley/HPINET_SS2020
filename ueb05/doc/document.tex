@@ -16,95 +16,128 @@
         Avg = \sum_{n=0}^N \frac{\binom{N}{n}\left( N-n+1 \right)! \cdot C_n }{\sum_{k=0}^N \binom{N}{k}\left( N-k+1 \right)!}
     \end{equation}
 
-    \begin{itemize}
-        \item \verb|avg Input Queue Length|
-            \begin{itemize}
-                \item Generated Packets
-                    \begin{itemize}
-                        \item size: $ s = \SI{512}{b}$
-                        \item send interval: $ t = \SI{512}{ns}$
-                    \end{itemize}
-                \item Connection to XBar
-                    \begin{itemize}
-                        \item data rate: $\SI{1}{Gbps}$
-                    \end{itemize}
-            \end{itemize}
+    \subsubsection{avg Input Queue Length}
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=\columnwidth, page=2]{../../python/results/preopt-General-0}
+            \caption{Pre Optimization}%
+            \label{fig:}
+        \end{figure}
+
+        \begin{itemize}
+            \item Generated Packets
+                \begin{itemize}
+                    \item size: $ s = \SI{512}{b}$
+                    \item send interval: $ t = \SI{512}{ns}$
+                \end{itemize}
+            \item Connection to XBar
+                \begin{itemize}
+                    \item data rate: $\SI{1}{Gbps}$
+                \end{itemize}
+        \end{itemize}
 
         \begin{align}
             r_\text{gen} &= \frac{\SI{512}{b}}{\SI{512}{ns}} = \SI{1}{Gbps}\\
             C_n &= \SI{250}{Mbps}\cdot n\\
             r_\text{q fill,eff} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
-                               &= \SI{347.5}{Mbps}\\
-            \Rightarrow l_\text{q,avg} &= \frac{t_\text{sim}\cdot r_\text{q fill, eff}}{2\cdot s} = 3394
+                                &= \SI{347.5}{Mbps}\\
+            \Rightarrow l_\text{q, avg} &= \frac{t_\text{sim}\cdot r_\text{q fill, eff}}{2\cdot s} = 3394
         \end{align}
 
-        \item \verb|avg End-to-End Latency|
-            \begin{itemize}
-                \item (no delays inside buffers, because the generated data rate, even for all 4 apps, is lower than a single data rate channels maximum throughput)
-                \item minimum
-                    \begin{itemize}
-                        \item App $\rightarrow$ C $\rightarrow$ Inport
-                            $\rightarrow$ C $\rightarrow$ Outport $\rightarrow$ C $\rightarrow$ App
-                        \item delay for packet: $t_{delay}=512ns$ (per \verb|DatarateChannel| C)
-                            \begin{equation}
-                                \Rightarrow t_{e2e,min} = \SI{1.536}{\mu s}
-                            \end{equation}
-                    \end{itemize}
-                \item maximum
+    \subsubsection{avg End-to-End Latency}
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=\columnwidth, page=8]{../../python/results/preopt-General-0}
+        \caption{Pre Optimization e2e latency}%
+        \label{fig:preopt-2e2}
+    \end{figure}
+        \begin{itemize}
+            \item (no delays inside buffers, because the generated data rate, even for all 4 apps, is lower than a single data rate channels maximum throughput)
+            \item minimum
+                \begin{itemize}
+                    \item App $\rightarrow$ C $\rightarrow$ Inport
+                        $\rightarrow$ C $\rightarrow$ Outport $\rightarrow$ C $\rightarrow$ App
+                    \item delay for packet: $t_{delay}=512ns$ (per \verb|DatarateChannel| C)
+                        \begin{equation}
+                            \Rightarrow t_{e2e,min} = \SI{1.536}{\mu s}
+                        \end{equation}
+                \end{itemize}
+            \item maximum
 
-                    at end of simulation, inport buffer full, all in to one out
+                at end of simulation, inport buffer full, all in to one out
 
-                    \begin{align}
-                        l_{inport q, max} &= 7031\\
-                        r_{dequeue, min} &= \SI{250}{Mbps}\\
-                        t_\text{in queue, max} &= \frac{t_{q,inport}\cdot s}{r_{dequeue}} = \SI{3.599}{ms}\\
-                    \end{align}
+                \begin{align}
+                    l_{inport q, max} &= 7031\\
+                    r_{dequeue, min} &= \SI{250}{Mbps}\\
+                    t_\text{in queue, max} &= \frac{t_{q,inport}\cdot s}{r_{dequeue}} = \SI{3.599}{ms}\\
+                \end{align}
 
-                \item on avg
-                    \begin{align}
-                        t_\text{e2e, avg} &= t_\text{in queue, max} / 2 = \SI{1.8}{ms}
-                    \end{align}
+            \item on avg
+                \begin{align}
+                    t_\text{e2e, avg} &= t_\text{in queue, max} / 2 = \SI{1.8}{ms}
+                \end{align}
 
-            \end{itemize}
-        \item \verb|avg Arbiter Request Queue Length|
-            \begin{itemize}
-                \item cases
-                    \begin{align}
-                        C_n &= n-1 \qquad 1\leq n\leq4=N
-                    \end{align}
-                \item on avg (analogously to $t_{e2e}$)
-                    \begin{equation}
-                        \Rightarrow l_{arbq,avg} = \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141} = 0.39
-                    \end{equation}
-            \end{itemize}
-        \item \verb|avg Arbiter Request Queue Time|
-            \begin{itemize}
-                \item cases
-                    \begin{align}
-                        C_n &= \SI{512}{ns} * n
-                    \end{align}
-                \item on avg
-                    \begin{align}
-                        \Rightarrow t_{arbq,avg} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
-                                                 &=
-                    \end{align}
-            \end{itemize}
-        \item \verb|avg Output Buffer Queue Length|
-            \begin{itemize}
-                \item Generated Packets
-                    \begin{itemize}
-                        \item size: $ s = \SI{512}{b}$
-                        \item send interval: $ t = \text{uniform}(\SI{1}{\mu s}, \SI{10}{\mu s}) = \SI{5.5}{\mu s}$
-                    \end{itemize}
-                \item Connection to and in XBar
-                    \begin{itemize}
-                        \item data rate: $\SI{1}{Gbps}$
-                    \end{itemize}
-            \end{itemize}
-            \begin{align}
-                r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}} = \SI{93}{Mbps}\\
-                \Rightarrow l_\text{q,avg} = 0
-            \end{align}
+        \end{itemize}
+
+    \subsubsection{avg Arbiter Request Queue Length}
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=\columnwidth, page=4]{../../python/results/preopt-General-0}
+        \caption{Pre Optimization Queue Length}%
+        \label{fig:postopt-General-0}
+    \end{figure}
+        \begin{itemize}
+            \item cases
+                \begin{align}
+                    C_n &= n-1 \qquad 1\leq n\leq4=N
+                \end{align}
+            \item on avg (analogously to $t_{e2e}$)
+                \begin{equation}
+                    \Rightarrow l_{arbq,avg} = \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141} = 0.39
+                \end{equation}
+        \end{itemize}
+    \subsubsection{avg Arbiter Request Queue Time}
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=\columnwidth, page=7]{../../python/results/preopt-General-0}
+            \caption{Pre Optimization Arbiter Queue Times}%
+            \label{fig:preopt-arbiter-qtime}
+        \end{figure}
+        \begin{itemize}
+            \item cases
+                \begin{align}
+                    C_n &= \SI{512}{ns} * n
+                \end{align}
+            \item on avg
+                \begin{align}
+                    \Rightarrow t_{arbq,avg} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
+                                             &=
+                \end{align}
+        \end{itemize}
+
+    \subsubsection{avg Output Buffer Queue Length}
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=\columnwidth, page=6]{../../pthon/results/preopt-General-0}
+            \caption{../../pthon/results/preopt-General-0}%
+            \label{fig:../../pthon/results/preopt-General-0}
+        \end{figure}
+        \begin{itemize}
+            \item Generated Packets
+                \begin{itemize}
+                    \item size: $ s = \SI{512}{b}$
+                    \item send interval: $ t = \text{uniform}(\SI{1}{\mu s}, \SI{10}{\mu s}) = \SI{5.5}{\mu s}$
+                \end{itemize}
+            \item Connection to and in XBar
+                \begin{itemize}
+                    \item data rate: $\SI{1}{Gbps}$
+                \end{itemize}
+        \end{itemize}
+        \begin{align}
+            r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}} = \SI{93}{Mbps}\\
+            \Rightarrow l_\text{q,avg} = 0
+        \end{align}
+    \begin{itemize}
         \item \verb|avg Throughput|
 
             input and output buffers always empty
