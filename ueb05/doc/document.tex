@@ -12,6 +12,20 @@
         Bestimmen und begründen Sie wie die Werte zustande kommen
     \end{verbatim}
 
+    When observing the crossbar, we see certain values for minimum and maximum, as well as in between. For example the waiting time inside the arbiter queue is one of
+
+    \begin{align}
+        t_\text{wait} \in \{ 0, 512, 1024, 1536 \}
+    \end{align}
+
+    To get to a approximation of the avg values we then needed to weight these values by certain criteria:
+
+    \begin{itemize}
+        \item A number of Nodes is generating messages for a subset of nodes (could be from 1 to 4 in size) $\Rightarrow \binom{N}{n}$
+        \item These subsets could be distributed in certain ways to the generating nodes. $\Rightarrow (N-n+1)!$
+        \item 
+    \end{itemize}
+
     \begin{equation}
         Avg = \sum_{n=0}^N \frac{\binom{N}{n}\left( N-n+1 \right)! \cdot C_n }{\sum_{k=0}^N \binom{N}{k}\left( N-k+1 \right)!}
     \end{equation}
@@ -97,7 +111,7 @@
                 \end{equation}
         \end{itemize}
     \subsubsection{avg Arbiter Request Queue Time}
-        \begin{figure}[ht]
+        \begin{figure}[H]
             \centering
             \includegraphics[width=\columnwidth, page=7]{../../python/results/preopt-General-0}
             \caption{Pre Optimization Arbiter Queue Times}%
@@ -118,9 +132,9 @@
     \subsubsection{avg Output Buffer Queue Length}
         \begin{figure}[ht]
             \centering
-            \includegraphics[width=\columnwidth, page=6]{../../pthon/results/preopt-General-0}
-            \caption{../../pthon/results/preopt-General-0}%
-            \label{fig:../../pthon/results/preopt-General-0}
+            \includegraphics[width=\columnwidth, page=6]{../../python/results/preopt-General-0}
+            \caption{Pre Optimization Output buffer Queue Time}%
+            \label{fig:preopt-output-qtime}
         \end{figure}
         \begin{itemize}
             \item Generated Packets
@@ -137,26 +151,29 @@
             r_\text{generated} =& \frac{\SI{512}{b}}{\SI{5.5}{\mu s}} = \SI{93}{Mbps}\\
             \Rightarrow l_\text{q,avg} = 0
         \end{align}
-    \begin{itemize}
-        \item \verb|avg Throughput|
 
-            input and output buffers always empty
-            \begin{align}
-                r_{cross} &= 4*r_\text{gen}\\
-                &= \SI{372}{Mbps}
-            \end{align}
-    \end{itemize}
+    \subsubsection{avg Throughput}
+        \begin{align}
+            r_{cross} &= 4\cdot\left( r_\text{gen} - r_\text{q fill, eff} \right)\\
+                      &= 4 \cdot \left( \SI{1000}{Mbps} - \SI{372}{Mbps}\right)\\
+                      &= \SI{2512}{Mbps}
+        \end{align}
+
     \subsection{Throughput vs. Ports}
-    \begin{itemize}
-        \item with our formula
-            {0.6, 0.44, 0.347518, 0.286498, 0.243324, 0.211277, 0.186604, 0.167047, 0.151176, 0.138045,
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{ccc}
+            \textbf{\# Nodes} & \textbf{$r_\text{q fill, eff}$} & \textbf{$r_\text{q fill, sim}$}\\
+            2 & \SI{600}{Mbps} & \SI{5}{Mbps}\\
+            4 & \SI{347}{Mbps} & \SI{}{Mbps}\\
+            8 & \SI{167}{Mbps} & \SI{}{Mbps}\\
+            16 & \SI{90}{Mbps} & \SI{}{Mbps}\\
+            32 & \SI{48}{Mbps} & \SI{}{Mbps}
+            \end{tabular}
+        \end{table}
 
-    0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396,
+        %{0.6, 0.44, 0.347518, 0.286498, 0.243324, 0.211277, 0.186604, 0.167047, 0.151176, 0.138045, 0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396, 0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485, 0.0519832, 0.0503302, 0.048779}
 
-    0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485,
-
-    0.0519832, 0.0503302, 0.048779}
-    \end{itemize}
     \subsection{Throughput vs. Injection Rate}
     \begin{itemize}
         \item not in saturation until delay $\leq \SI{832}{ns}$
@@ -192,22 +209,33 @@ queues also rises.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\columnwidth, page=2]{../simulations/results/General-0}
+    \includegraphics[width=\columnwidth, page=2]{../../python/results/postopt-General-0}
     \caption{sim}%
-    \label{fig:optsim_inport_qlen}
+    \label{fig:postopt-inport-qlen}
 \end{figure}
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\columnwidth, page=8]{../simulations/results/General-0}
+    \includegraphics[width=\columnwidth, page=8]{../../python/results/postopt-General-0}
     \caption{}%
-    \label{fig:}
+    \label{fig:postopt-app-e2e}
 \end{figure}
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\columnwidth, page=4]{../simulations/results/General-0}
+    \includegraphics[width=\columnwidth, page=4]{../../python/results/postopt-General-0}
     \caption{}%
-    \label{fig:}
+    \label{fig:postopt-arbiter-qlen}
 \end{figure}
-%\includegraphics[width=\columnwidth, page=5]{../simulations/results/General-0}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\columnwidth, page=7]{../../python/results/postopt-General-0}
+    \caption{}%
+    \label{fig:postopt-arbiter-qtime}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\columnwidth, page=6]{../../python/results/postopt-General-0}
+    \caption{}%
+    \label{fig:postopt-outbuf-qtime}
+\end{figure}
 
 \end{document}
