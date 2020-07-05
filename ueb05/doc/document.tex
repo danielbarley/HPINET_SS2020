@@ -15,23 +15,31 @@
     When observing the crossbar, we see certain values for minimum and maximum, as well as in between. For example the waiting time inside the arbiter queue is one of
 
     \begin{align}
-        t_\text{wait} \in \{ 0, 512, 1024, 1536 \}
+        t_\text{wait} \in \{ 0, 512, 1024, 1536 \} = C
     \end{align}
 
     To get to a approximation of the avg values we then needed to weight these values by certain criteria:
 
     \begin{itemize}
-        \item A number of Nodes is generating messages for a subset of nodes (could be from 1 to 4 in size) $\Rightarrow \binom{N}{n}$
+        \item A number of Nodes is generating messages for a subset of nodes (could be from 1 to N in size) $\Rightarrow \binom{N}{n}$
         \item These subsets could be distributed in certain ways to the generating nodes. $\Rightarrow (N-n+1)!$
-        \item 
     \end{itemize}
 
+    this would mean our weigth $w_n$ is
+    \begin{align}
+        w_n= \binom{N}{n}\left( N-n+1 \right)!
+    \end{align}
+
+    and our avg for a number $N$ of values $C_n$ to avg:
+
     \begin{equation}
-        Avg = \sum_{n=0}^N \frac{\binom{N}{n}\left( N-n+1 \right)! \cdot C_n }{\sum_{k=0}^N \binom{N}{k}\left( N-k+1 \right)!}
+        Avg = \sum_{n=0}^N \frac{w_n \cdot C_n }{\sum_{k=0}^N w_n}
     \end{equation}
 
+    And while this may be disragarding othe reffects and randomness, it should give an apprimation within reason of the simulated values.
+
     \subsubsection{avg Input Queue Length}
-        \begin{figure}[ht]
+        \begin{figure}[H]
             \centering
             \includegraphics[width=\columnwidth, page=2]{../../python/results/preopt-General-0}
             \caption{Pre Optimization}%
@@ -59,7 +67,7 @@
         \end{align}
 
     \subsubsection{avg End-to-End Latency}
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=\columnwidth, page=8]{../../python/results/preopt-General-0}
         \caption{Pre Optimization e2e latency}%
@@ -94,7 +102,7 @@
         \end{itemize}
 
     \subsubsection{avg Arbiter Request Queue Length}
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=\columnwidth, page=4]{../../python/results/preopt-General-0}
         \caption{Pre Optimization Queue Length}%
@@ -103,8 +111,9 @@
         \begin{itemize}
             \item cases
                 \begin{align}
-                    C_n &= n-1 \qquad 1\leq n\leq4=N
+                    C_n &= n-1 \qquad 0\leq n<4=N
                 \end{align}
+                where $C_n$ is the number of waiting packets
             \item on avg (analogously to $t_{e2e}$)
                 \begin{equation}
                     \Rightarrow l_{arbq,avg} = \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141} = 0.39
@@ -120,17 +129,17 @@
         \begin{itemize}
             \item cases
                 \begin{align}
-                    C_n &= \SI{512}{ns} * n
+                    C_n &= \SI{512}{ns} \cdot n
                 \end{align}
             \item on avg
                 \begin{align}
                     \Rightarrow t_{arbq,avg} &= \sum_{n=1}^4 \frac{\binom{4}{n}\left( 5-n \right)! \cdot C_n }{141}\\
-                                             &=
+                                             &= \SI{711}{ns}
                 \end{align}
         \end{itemize}
 
     \subsubsection{avg Output Buffer Queue Length}
-        \begin{figure}[ht]
+        \begin{figure}[H]
             \centering
             \includegraphics[width=\columnwidth, page=6]{../../python/results/preopt-General-0}
             \caption{Pre Optimization Output buffer Queue Time}%
@@ -153,26 +162,26 @@
         \end{align}
 
     \subsubsection{avg Throughput}
+        This calculation is based on the inport queue fillrate that we estimated using our formula
         \begin{align}
-            r_{cross} &= 4\cdot\left( r_\text{gen} - r_\text{q fill, eff} \right)\\
+            r_\text{tp, eff} &= 4\cdot\left( r_\text{gen} - r_\text{q fill, eff} \right)\\
                       &= 4 \cdot \left( \SI{1000}{Mbps} - \SI{372}{Mbps}\right)\\
                       &= \SI{2512}{Mbps}
         \end{align}
 
     \subsection{Throughput vs. Ports}
+        Here we caclulated the theoretical throughput and compared it with the simulated, based on the inport fillrate.
         \begin{table}[H]
             \centering
             \begin{tabular}{ccc}
-            \textbf{\# Nodes} & \textbf{$r_\text{q fill, eff}$} & \textbf{$r_\text{q fill, sim}$}\\
-            2 & \SI{600}{Mbps} & \SI{5}{Mbps}\\
-            4 & \SI{347}{Mbps} & \SI{}{Mbps}\\
-            8 & \SI{167}{Mbps} & \SI{}{Mbps}\\
-            16 & \SI{90}{Mbps} & \SI{}{Mbps}\\
-            32 & \SI{48}{Mbps} & \SI{}{Mbps}
+            \textbf{\# Nodes} & \textbf{$r_\text{tp, eff}$} & \textbf{$r_\text{tp, sim}$}\\
+            2 & \SI{700}{Mbps} & \SI{752}{Mbps}\\
+            4 & \SI{653}{Mbps} & \SI{655}{Mbps}\\
+            8 & \SI{627}{Mbps} & \SI{616}{Mbps}\\
+            16 & \SI{616}{Mbps} & \SI{603}{Mbps}\\
+            32 & \SI{610}{Mbps} & \SI{591}{Mbps}
             \end{tabular}
         \end{table}
-
-        %{0.6, 0.44, 0.347518, 0.286498, 0.243324, 0.211277, 0.186604, 0.167047, 0.151176, 0.138045, 0.127005, 0.117594, 0.109478, 0.102407, 0.0961928, 0.0906881, 0.0857783, 0.0813722, 0.077396, 0.0737899, 0.0705046, 0.067499, 0.0647391, 0.0621958, 0.0598446, 0.0576646, 0.0556378, 0.0537485, 0.0519832, 0.0503302, 0.048779}
 
     \subsection{Throughput vs. Injection Rate}
     \begin{itemize}
@@ -186,6 +195,13 @@
         \item throughput at saturation point $r_{sat} = \SI{1}{Gbps}$
         \item If the Arbiter can only work at $\approx$ 62\% of the bandwidth, we reach this saturation point if 62\% of the bandwidth is \SI{1}{Gbps}, therefore the required bandwith is \SI{1613}{Gbps}
     \end{itemize}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\columnwidth, page=9]{../../python/results/preopt-General-0}
+        \caption{Busy state of Output Buffer out}%
+        \label{fig:../../python/results/preopt-General-0}
+    \end{figure}
 \section{Optimizations}
 \subsection{Problems}
 In the previous exercise we determined the arbiter to be the limiting resource.
@@ -207,31 +223,31 @@ pointers to the virtual queues. Spatial constraints have to be taken into accoun
 as well as scalability. With more possible routing decisions the number of virtual
 queues also rises.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth, page=2]{../../python/results/postopt-General-0}
     \caption{sim}%
     \label{fig:postopt-inport-qlen}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth, page=8]{../../python/results/postopt-General-0}
     \caption{}%
     \label{fig:postopt-app-e2e}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth, page=4]{../../python/results/postopt-General-0}
     \caption{}%
     \label{fig:postopt-arbiter-qlen}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth, page=7]{../../python/results/postopt-General-0}
     \caption{}%
     \label{fig:postopt-arbiter-qtime}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth, page=6]{../../python/results/postopt-General-0}
     \caption{}%
