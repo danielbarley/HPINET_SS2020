@@ -38,6 +38,8 @@ ueb*/simulations/results/
 ueb*/out/
 /.metadata/
 ueb*/**/Makefile
+**/*_m.cc
+**/*_m.h
 
 # LaTeX
 ## Core latex/pdflatex auxiliary files:

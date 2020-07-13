@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #include "Application.h"
 #include "TopologyHelper.h"
@@ -27,6 +27,10 @@ void Application::initialize() {
     } else {
         scheduleAt(simTime(), new cMessage("App: Selfmsg"));
     }
+
+    // Signals
+    hopCnt = registerSignal("sigHopCnt");
+    pcktSize = registerSignal("sigPcktSize");
 }
 
 void Application::probeAllNodes() {
@@ -52,6 +56,7 @@ void Application::finish() {
 HLPacket *Application::generatePacket() {
     HLPacket *hlp = new HLPacket();
     int size = (int) par("PKT_SIZE");
+    emit(pcktSize, size);
     int flitSize = (int)par("FLIT_BYTES");
     /* This is a hack to make the
      * packet size divisible by the flit size.
@@ -88,6 +93,8 @@ void Application::handleMessage(cMessage *msg) {
            INFO(("Packet misrouted. Should be delivered to %d, but got sent to %d\n",
                    hlp->getDescriptor(), (int) par("NODE_ID")));
        }
+       emit(hopCnt, dynamic_cast<HLPacket *>(msg)->getHopCnt());
+       emit(E2ELatency, dynamic_cast<HLPacket *>(msg)->get());
        delete msg;
     }
 }
