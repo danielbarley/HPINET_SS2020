@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #include "Xbar.h"
 #include "../Packets/IntFlowCtrl_m.h"
@@ -37,6 +37,8 @@ void Xbar::initialize() {
 
     WATCH_VECTOR(NODE_COUNT);
     WATCH_VECTOR(MY_NODE_COORD);
+
+    sigServiceLatency = registerSignal("sigServiceLatency");
 }
 
 Xbar::~Xbar() {
@@ -212,6 +214,7 @@ void Xbar::serviceRouting() {
     cQueue::Iterator it(*routeRequests);
     while (!it.end()) {
         VirtualChannelFrame *vcf = (VirtualChannelFrame*) *it;
+        emit(sigServiceLatency, simTime() - vcf->getEnqueued());
         int gateId = vcf->getArrivalGate()->getIndex();
         int vid = vcf->getVirtualChannel();
         // Use getEncapsulated packet because the vcf must remain untouched, because
@@ -258,6 +261,7 @@ void Xbar::handleMessage(cMessage *msg) {
             // packet first before relaying
             relayDestToSrc(gateId, vid, vcf->decapsulate(), true);
         } else if (fcm->getAction() == INT_ROUTE_REQUEST) {
+            vcf->setEnqueued(simTime());
             routeRequests->insert(vcf);
             serviceRouting();
             deleteMsg = false;

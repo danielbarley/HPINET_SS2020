@@ -94,7 +94,7 @@ void Application::handleMessage(cMessage *msg) {
                    hlp->getDescriptor(), (int) par("NODE_ID")));
        }
        emit(hopCnt, dynamic_cast<HLPacket *>(msg)->getHopCnt());
-       emit(E2ELatency, dynamic_cast<HLPacket *>(msg)->get());
+       emit(E2ELatency, simTime() - dynamic_cast<HLPacket *>(msg)->getCreationTime());
        delete msg;
     }
 }

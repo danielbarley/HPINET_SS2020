@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 
 #include "LineDriver.h"
@@ -71,6 +71,10 @@ void LineDriver::initialize() {
         vectorRecorder->init(this, ss2.str().c_str(), "vector", nullptr, attrs);
         subscribe(sigPacketStuckTimes.at(i), warmupFilter);
         warmupFilter->addDelegate(vectorRecorder);
+
+        std::stringstream ss3;
+        ss << "sigBufLen-vid" << i;
+        sigBufLen.push_back(registerSignal(ss.str().c_str()));
     }
     extSendNextMessageSMScheduled = false;
     queueCapacity = par("BUFFER_SIZE");
@@ -195,6 +199,7 @@ void LineDriver::serviceIntTx(int vId) {
                 intTransmissionLastFlitSent.at(vId) = true;
             }
             getQueue(vId)->pop();
+            emit(sigBufLen[vId], getQueue(vId)->getLength());
             VirtualChannelFrame *nextFlitWrap = new VirtualChannelFrame();
             nextFlitWrap->setVirtualChannel(vId);
             nextFlitWrap->encapsulate(nextFlit);
@@ -261,6 +266,7 @@ void LineDriver::handleVcf(VirtualChannelFrame *vcf) {
            if ((getQueue(vId)->getLength() <= queueCapacity) && (queueCapacity > 0)) {
                Flit* flit = (Flit *) vcf->decapsulate(); //Extract the Flit from the VCF.
                getQueue(vId)->insert(flit);
+               emit(sigBufLen[vId], getQueue(vId)->getLength());
                flit->setArrivalTime(simTime()); // Set the arrival time for Deadlock-Monitoring
                serviceIntTx(vId); // Service the Queue.
                if ((getQueue(vId)->getLength() == (int) par("XOFF_THRES")) && ((int) par("XOFF_THRES") > 0)) { // Send the XOFF Frame

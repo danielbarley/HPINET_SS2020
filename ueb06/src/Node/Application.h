@@ -34,9 +34,9 @@ class Application : public cSimpleModule
     int NODE_CNT;
 
     // Signals
-    long hopCnt;
-    long pcktSize;
-    long E2ELatency;
+    simsignal_t hopCnt;
+    simsignal_t pcktSize;
+    simsignal_t E2ELatency;
 };
 
 #endif
