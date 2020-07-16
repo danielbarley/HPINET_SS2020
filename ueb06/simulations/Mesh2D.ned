@@ -23,8 +23,7 @@ import ned.DatarateChannel;
 //
 // A generated network with grid topology.
 //
-network Mesh2D
-{
+network Mesh2D {
     parameters:
         int columns = default(4);
         int rows = default(4);
@@ -33,11 +32,12 @@ network Mesh2D
             @display("p=50,50,m,4,75,75");
             gates:
                 data[4];
+                flowCtrl[4];
         }
     connections allowunconnected:
         for i=0..rows-1, for j=0..columns-2 {
             node[i*columns+j].data[1] <--> DatarateChannel <--> node[i*columns+j+1].data[0] if j!=columns-1;
-            node[i*columns+j].flowCtrl[1] <--> DatarateChannel <--> node[(i+1)*columns+j].flowCtrl[0] if i!=rows-1;
+            node[i*columns+j].flowCtrl[1] <--> DatarateChannel <--> node[i*columns+j+1].flowCtrl[0] if i!=columns-1;
         }
         for i=0..rows-2, for j=0..columns-1 {
             node[i*columns+j].data[3] <--> DatarateChannel <--> node[(i+1)*columns+j].data[2] if i!=rows-1;
